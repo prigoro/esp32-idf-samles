@@ -24,6 +24,68 @@ void TaskLvglHandler(void *Parameters);
 void TaskLvglTest(void *Parameters);
 static lv_obj_t *kb;
 lv_obj_t *tabview;
+lv_style_t style_msg_win_wrapper;
+lv_style_t style_msg_win;
+lv_style_t style_all_btns;
+lv_obj_t *msgWrapper;
+
+void win()
+{
+
+  // Style of message window wrapper
+  lv_style_init(&style_msg_win_wrapper);
+  lv_style_set_width(&style_msg_win_wrapper, lv_pct(100));
+  lv_style_set_height(&style_msg_win_wrapper, lv_pct(100));
+  lv_style_set_border_width(&style_msg_win_wrapper, 0);
+  lv_style_set_bg_color(&style_msg_win_wrapper, lv_color_hex(0x000000));
+  // lv_style_set_bg_opa(&style_msg_win_wrapper, LV_OPA_20);
+  lv_style_set_bg_opa(&style_msg_win_wrapper, LV_OPA_60);
+  lv_style_set_radius(&style_msg_win_wrapper, 0);
+
+  // Style of message window
+  lv_style_init(&style_msg_win);
+  lv_style_set_border_width(&style_msg_win, 1);
+  lv_style_set_border_color(&style_msg_win, lv_color_hex(0x343434));
+  lv_style_set_radius(&style_msg_win, 8);
+  lv_style_set_align(&style_msg_win, LV_ALIGN_CENTER);
+
+  // Style of all buttons
+  lv_style_init(&style_all_btns);
+  lv_style_set_width(&style_all_btns, 160);
+  lv_style_set_height(&style_all_btns, 56);
+  lv_style_set_radius(&style_all_btns, 8);
+  lv_style_set_bg_color(&style_all_btns, lv_color_hex(0x2E51AE));
+  lv_style_set_text_align(&style_all_btns, LV_TEXT_ALIGN_CENTER);
+
+  // Creating the window wrapper
+  msgWrapper = lv_obj_create(lv_scr_act());
+  lv_obj_add_style(msgWrapper, &style_msg_win_wrapper, 0);
+
+  // Creating the message window
+  lv_obj_t *win = lv_win_create(msgWrapper, 0);
+  lv_obj_set_size(win, 400, 250);
+  lv_obj_add_style(win, &style_msg_win, 0);
+
+  // Get window content
+  lv_obj_t *cont = lv_win_get_content(win);
+  lv_obj_set_style_pad_all(cont, 0, 0);
+
+  // Creating the message label
+  lv_obj_t *label = lv_label_create(cont);
+  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 20);
+  lv_label_set_text(label, "This the msg win");
+
+  // Creating the "Ok" button
+  lv_obj_t *btn = lv_btn_create(cont);
+  lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -20);
+  lv_obj_add_style(btn, &style_all_btns, 0);
+  // lv_obj_add_event_cb(btn, cb_Close, LV_EVENT_CLICKED, msgWrapper);
+
+  label = lv_label_create(btn);
+  lv_obj_center(label);
+  lv_label_set_text(label, "OK");
+}
+
 void example_lvgl_demo_tabs_ui(lv_disp_t *disp)
 {
 
@@ -195,5 +257,15 @@ void TaskLvglTest(void *Parameters)
     xSemaphoreGive(xMutex_UI);
 
     vTaskDelay(pdMS_TO_TICKS(3000));
+
+    xSemaphoreTake(xMutex_UI, portMAX_DELAY);
+    win();
+    xSemaphoreGive(xMutex_UI);
+
+    vTaskDelay(pdMS_TO_TICKS(3000));
+
+    xSemaphoreTake(xMutex_UI, portMAX_DELAY);
+    lv_obj_del(msgWrapper);
+    xSemaphoreGive(xMutex_UI);
   }
 }

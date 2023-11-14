@@ -1,8 +1,1 @@
-0000000000000000000000000000000000000000 df836182c2540f4bfad9ea73ea59b9e977d8e4a8 prigoro <prigorovsky@gmail.com> 1699968302 +0200	clone: from https://github.com/prigoro/esp32-idf-samles
-df836182c2540f4bfad9ea73ea59b9e977d8e4a8 11bdd3f057c9281fbaf35bd95984677d6eca6ca6 prigoro <prigorovsky@gmail.com> 1699968568 +0200	commit: Create 911 sample
-11bdd3f057c9281fbaf35bd95984677d6eca6ca6 cff490bb78c8fad53dcf26a029611af49fcfe0b2 prigoro <prigorovsky@gmail.com> 1699968856 +0200	commit: Ass Goodix component
-cff490bb78c8fad53dcf26a029611af49fcfe0b2 799d273acc0884ccb8031cbffdf0ed4d4283159f prigoro <prigorovsky@gmail.com> 1699969038 +0200	commit: Build project
-799d273acc0884ccb8031cbffdf0ed4d4283159f 40dd0d17474ba8604b37f10bd21c4b4984bd91d3 prigoro <prigorovsky@gmail.com> 1699972966 +0200	commit: final driver
-40dd0d17474ba8604b37f10bd21c4b4984bd91d3 726561e637603fa51fdffaf69d4610d8f93a53a9 prigoro <prigorovsky@gmail.com> 1699976668 +0200	commit: Start the project
-726561e637603fa51fdffaf69d4610d8f93a53a9 3e91475d43d774454a250af919b42e11643d06dc prigoro <prigorovsky@gmail.com> 1699979584 +0200	commit: Separete (lcd_init.c)
-3e91475d43d774454a250af919b42e11643d06dc 9c3f6db5c32c4fbc45a52dc2a2cb93084bc18e86 prigoro <prigorovsky@gmail.com> 1699987454 +0200	commit: Refactoring
+cfb26f05af58a4ee837f51f9e5fdedb999a155c4
