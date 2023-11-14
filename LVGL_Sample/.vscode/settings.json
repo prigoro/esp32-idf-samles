@@ -1,0 +1,21 @@
+{
+    "idf.adapterTargetName": "esp32s3",
+    "idf.openOcdConfigs": [
+        "board/esp32s3-bridge.cfg"
+    ],
+    "idf.port": "/dev/cu.wchusbserial1d10",
+    "idf.flashType": "UART",
+    "files.associations": {
+        "esp_timer.h": "c",
+        "lv_log.h": "c",
+        "lv_timer.h": "c",
+        "lv_math.h": "c",
+        "lv_async.h": "c",
+        "lv_arc.h": "c",
+        "lv_api_map.h": "c",
+        "lv_hal.h": "c",
+        "lv_themes.h": "c",
+        "lv_libs.h": "c",
+        "lv_conf_internal.h": "c"
+    }
+}
