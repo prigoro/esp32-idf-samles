@@ -1,7 +1,7 @@
 {
     "git.ignoreLimitWarning": true,
     "idf.flashType": "UART",
-    "idf.port": "/dev/cu.Bluetooth-Incoming-Port",
+    "idf.port": "/dev/cu.wchusbserial1d10",
     "idf.adapterTargetName": "esp32s3",
     "idf.openOcdConfigs": [
         "board/esp32s3-bridge.cfg"
@@ -13,5 +13,8 @@
     },
     "idf.espIdfPath": "/Users/ihor/esp/esp-idf",
     "idf.pythonBinPath": "/Users/ihor/.espressif/python_env/idf5.1_py3.10_env/bin/python",
-    "idf.toolsPath": "/Users/ihor/.espressif"
+    "idf.toolsPath": "/Users/ihor/.espressif",
+    "files.associations": {
+        "goodix.h": "c"
+    }
 }
