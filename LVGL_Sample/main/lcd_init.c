@@ -69,6 +69,7 @@ lv_disp_t *lcd_init()
         .data_width = 16, // RGB565 in parallel mode, thus 16bit in width
         .psram_trans_align = 64,
         .num_fbs = EXAMPLE_LCD_NUM_FB,
+        
 #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
         .bounce_buffer_size_px = 10 * LCD_H_RES,
 #endif
