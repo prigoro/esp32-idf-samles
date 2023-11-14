@@ -12,13 +12,14 @@
 #include "esp_log.h"
 #include "lvgl.h"
 static const char *TAG = "example";
+#include "lcd_init.h"
 #include "lcd_init.c"
+
 
 extern void example_lvgl_demo_ui(lv_disp_t *disp);
 
 void app_main(void)
 {
-    
     example_lvgl_demo_ui(lcd_init());
     
     while (1) {

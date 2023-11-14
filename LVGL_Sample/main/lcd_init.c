@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "main.h"
+#include "lcd_init.h"
 #include "esp_log.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
@@ -42,6 +43,8 @@ static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) calle
 static lv_disp_drv_t disp_drv;      // contains callback functions
 esp_lcd_panel_handle_t panel_handle = NULL;
 
+/// @brief  init rgb panel
+/// @return lv_disp_t *
 lv_disp_t *lcd_init()
 {
 
@@ -67,36 +70,36 @@ lv_disp_t *lcd_init()
         .psram_trans_align = 64,
         .num_fbs = EXAMPLE_LCD_NUM_FB,
 #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
-        .bounce_buffer_size_px = 10 * EXAMPLE_LCD_H_RES,
+        .bounce_buffer_size_px = 10 * LCD_H_RES,
 #endif
         .clk_src = LCD_CLK_SRC_DEFAULT,
-        .disp_gpio_num = EXAMPLE_PIN_NUM_DISP_EN,
-        .pclk_gpio_num = EXAMPLE_PIN_NUM_PCLK,
-        .vsync_gpio_num = EXAMPLE_PIN_NUM_VSYNC,
-        .hsync_gpio_num = EXAMPLE_PIN_NUM_HSYNC,
-        .de_gpio_num = EXAMPLE_PIN_NUM_DE,
+        .disp_gpio_num = LCD_PIN_NUM_DISP_EN,
+        .pclk_gpio_num = LCD_PIN_NUM_PCLK,
+        .vsync_gpio_num = LCD_PIN_NUM_VSYNC,
+        .hsync_gpio_num = LCD_PIN_NUM_HSYNC,
+        .de_gpio_num = LCD_PIN_NUM_DE,
         .data_gpio_nums = {
-            EXAMPLE_PIN_NUM_DATA0,
-            EXAMPLE_PIN_NUM_DATA1,
-            EXAMPLE_PIN_NUM_DATA2,
-            EXAMPLE_PIN_NUM_DATA3,
-            EXAMPLE_PIN_NUM_DATA4,
-            EXAMPLE_PIN_NUM_DATA5,
-            EXAMPLE_PIN_NUM_DATA6,
-            EXAMPLE_PIN_NUM_DATA7,
-            EXAMPLE_PIN_NUM_DATA8,
-            EXAMPLE_PIN_NUM_DATA9,
-            EXAMPLE_PIN_NUM_DATA10,
-            EXAMPLE_PIN_NUM_DATA11,
-            EXAMPLE_PIN_NUM_DATA12,
-            EXAMPLE_PIN_NUM_DATA13,
-            EXAMPLE_PIN_NUM_DATA14,
-            EXAMPLE_PIN_NUM_DATA15,
+            LCD_PIN_NUM_DATA0,
+            LCD_PIN_NUM_DATA1,
+            LCD_PIN_NUM_DATA2,
+            LCD_PIN_NUM_DATA3,
+            LCD_PIN_NUM_DATA4,
+            LCD_PIN_NUM_DATA5,
+            LCD_PIN_NUM_DATA6,
+            LCD_PIN_NUM_DATA7,
+            LCD_PIN_NUM_DATA8,
+            LCD_PIN_NUM_DATA9,
+            LCD_PIN_NUM_DATA10,
+            LCD_PIN_NUM_DATA11,
+            LCD_PIN_NUM_DATA12,
+            LCD_PIN_NUM_DATA13,
+            LCD_PIN_NUM_DATA14,
+            LCD_PIN_NUM_DATA15,
         },
         .timings = {
             .pclk_hz = LCD_PIXEL_CLOCK_HZ,
-            .h_res = EXAMPLE_LCD_H_RES,
-            .v_res = EXAMPLE_LCD_V_RES,
+            .h_res = LCD_H_RES,
+            .v_res = LCD_V_RES,
             // The following parameters should refer to LCD spec
             .hsync_back_porch = 8,
             .hsync_front_porch = 8,
@@ -133,21 +136,21 @@ lv_disp_t *lcd_init()
     ESP_LOGI(TAG, "Use frame buffers as LVGL draw buffers");
     ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(panel_handle, 2, &buf1, &buf2));
     // initialize LVGL draw buffers
-    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES);
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LCD_H_RES * LCD_V_RES);
 #else
     ESP_LOGI(TAG, "Allocate separate LVGL draw buffers from PSRAM");
-    buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+    buf1 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
     assert(buf1);
-    buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+    buf2 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
     assert(buf2);
     // initialize LVGL draw buffers
-    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, EXAMPLE_LCD_H_RES * 100);
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LCD_H_RES * 100);
 #endif // CONFIG_EXAMPLE_DOUBLE_FB
 
     ESP_LOGI(TAG, "Register display driver to LVGL");
     lv_disp_drv_init(&disp_drv);
-    disp_drv.hor_res = EXAMPLE_LCD_H_RES;
-    disp_drv.ver_res = EXAMPLE_LCD_V_RES;
+    disp_drv.hor_res = LCD_H_RES;
+    disp_drv.ver_res = LCD_V_RES;
     disp_drv.flush_cb = example_lvgl_flush_cb;
     disp_drv.draw_buf = &disp_buf;
     disp_drv.user_data = panel_handle;
