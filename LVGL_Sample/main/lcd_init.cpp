@@ -1,32 +1,5 @@
-// #include <stdio.h>
-// #include "main.h"
-// #include "driver/gpio.h"
-// #include "freertos/FreeRTOS.h"
-// #include "freertos/task.h"
-// #include "lcd_init.h"
-// #include "esp_log.h"
-// #include "lvgl.h"
-// #include "esp_lcd_panel_ops.h"
-// #include "esp_lcd_panel_rgb.h"
 
-extern "C"
-{
-
-#include <stdio.h>
-#include "sdkconfig.h"
-#include "main.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#include "esp_timer.h"
-#include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_rgb.h"
-#include "driver/gpio.h"
-#include "esp_err.h"
-#include "esp_log.h"
-#include "lvgl.h"
 #include "lcd_init.h"
-#include "esp_heap_caps.h"
 
     extern "C"
     {
@@ -83,11 +56,7 @@ extern "C"
 
 #if LCD_PIN_NUM_BK_LIGHT >= 0
             ESP_LOGI(TAG_lcd, "Turn off LCD backlight");
-            // gpio_config_t bk_gpio_config = {
-            //     .mode = GPIO_MODE_OUTPUT,
-            //     .pin_bit_mask = 1ULL << LCD_PIN_NUM_BK_LIGHT};
-            // ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
-            gpio_set_direction((gpio_num_t)LCD_PIN_NUM_BK_LIGHT, GPIO_MODE_OUTPUT);
+            ESP_ERROR_CHECK(gpio_set_direction((gpio_num_t)LCD_PIN_NUM_BK_LIGHT, GPIO_MODE_OUTPUT));
 
 #endif
 
@@ -145,8 +114,7 @@ extern "C"
                 },
                 // .flags.fb_in_psram = true, // allocate frame buffer in PSRAM
             };
-            // ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &panel_handle));
-            esp_lcd_new_rgb_panel(&panel_config, &panel_handle);
+            ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &panel_handle));
 
             ESP_LOGI(TAG_lcd, "Register event callbacks");
             esp_lcd_rgb_panel_event_callbacks_t cbs = {
@@ -207,4 +175,3 @@ extern "C"
             return disp;
         }
     }
-}

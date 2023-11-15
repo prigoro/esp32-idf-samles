@@ -1,4 +1,17 @@
+#include <stdio.h>
+#include "sdkconfig.h"
+#include "main.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_timer.h"
+#include "esp_lcd_panel_ops.h"
+#include "esp_lcd_panel_rgb.h"
+#include "driver/gpio.h"
+#include "esp_err.h"
+#include "esp_log.h"
 #include "lvgl.h"
+#include "esp_heap_caps.h"
 
 #define LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
 #define LCD_BK_LIGHT_ON_LEVEL 1
