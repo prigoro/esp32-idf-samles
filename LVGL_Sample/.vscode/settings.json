@@ -18,5 +18,6 @@
         "lv_libs.h": "c",
         "lv_conf_internal.h": "c",
         "stdio.h": "c"
-    }
+    },
+    "cmake.options.statusBarVisibility": "visible"
 }
