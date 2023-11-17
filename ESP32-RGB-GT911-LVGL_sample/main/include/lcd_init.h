@@ -4,6 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
 #include "esp_timer.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
@@ -13,7 +14,9 @@
 #include "lvgl.h"
 #include "esp_heap_caps.h"
 
+
 #define LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
+// #define LCD_PIXEL_CLOCK_HZ 14000000
 #define LCD_BK_LIGHT_ON_LEVEL 1
 #define LCD_BK_LIGHT_OFF_LEVEL !LCD_BK_LIGHT_ON_LEVEL
 #define LCD_PIN_NUM_BK_LIGHT 2
@@ -53,12 +56,6 @@
 #endif // CONFIG_EXAMPLE_DOUBLE_FB
 
 #define EXAMPLE_LVGL_TICK_PERIOD_MS 2
-
-// we use two semaphores to sync the VSYNC event and the LVGL task, to avoid potential tearing effect
-#if CONFIG_EXAMPLE_AVOID_TEAR_EFFECT_WITH_SEM
-SemaphoreHandle_t sem_vsync_end;
-SemaphoreHandle_t sem_gui_ready;
-#endif
 
 #ifdef __cplusplus
 extern "C"

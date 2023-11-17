@@ -6,8 +6,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
 #include "esp_timer.h"
-#include "esp_lcd_panel_ops.h"
+// #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
@@ -18,16 +19,13 @@
 #include "lcd_init.cpp"
 #include "Goodix.h"
 
-Goodix touch = Goodix();
-
+// extern "C" { void app_main(); }
 extern "C"
 {
+  Goodix touch = Goodix();
   SemaphoreHandle_t xMutex_UI;
 
-  //
   void TaskLvglHandler(void *Parameters);
-  void TaskTouchHandler(void *Parameters);
-  void TaskLvglTest(void *Parameters);
 
   static lv_obj_t *kb;
   lv_obj_t *tabview;
@@ -45,7 +43,7 @@ extern "C"
     lv_style_set_border_width(&style_msg_win_wrapper, 0);
     lv_style_set_bg_color(&style_msg_win_wrapper, lv_color_hex(0x000000));
     // lv_style_set_bg_opa(&style_msg_win_wrapper, LV_OPA_20);
-    lv_style_set_bg_opa(&style_msg_win_wrapper, LV_OPA_60);
+    lv_style_set_bg_opa(&style_msg_win_wrapper, LV_OPA_0);
     lv_style_set_radius(&style_msg_win_wrapper, 0);
 
     // Style of all buttons
@@ -107,14 +105,12 @@ extern "C"
   static void btn_event_cb(lv_event_t *e)
   {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *btn = lv_event_get_target(e);
     if (code == LV_EVENT_CLICKED)
     {
       win();
     }
   }
 
-  // Event disable main tabs animation
   static void scroll_begin_event2(lv_event_t *e)
   {
     /*Disable the scroll animations. Triggered when a tab button is clicked */
@@ -128,7 +124,6 @@ extern "C"
 
   void example_lvgl_demo_tabs_ui(lv_disp_t *disp)
   {
-
     tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 50);
 
     /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
@@ -179,6 +174,7 @@ extern "C"
     /*Create a slider in the center of the display*/
     lv_obj_t *slider = lv_slider_create(tab2);
     lv_obj_set_width(slider, 700);
+    lv_slider_set_range(slider, 0, 100);
     lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -20);
 
     // tab3
@@ -186,12 +182,13 @@ extern "C"
     lv_label_set_text(label, "Tontainer content first tab If the\n\n"
                              "If the becomes longer If the content automatically\n"
                              "of automatically longer If the contenttab\n"
-                             "becomes longer If the content automatically too\n"
-                             "longer scrollable. becomes longer If the conten\n"
-                             "than theauto matically longer If the content \n"
-                             "container longer If the content automatically to\n"
-                             "then it This the first tab If the content automatically\n"
-                             "automatically then it This the first\n");
+                             "becomes longer If the content automatically too\n");
+    /*Create a spinner*/
+    lv_obj_t *spinner = lv_spinner_create(tab3, 1000, 60);
+    lv_obj_set_size(spinner, 100, 100);
+    lv_obj_center(spinner);
+    lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, -100);
+
     lv_obj_t *btn = lv_btn_create(tab3);                        /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                                /*Set its position*/
     lv_obj_set_size(btn, 300, 50);                              /*Set its size*/
@@ -238,18 +235,6 @@ extern "C"
     lv_obj_scroll_to_view_recursive(label, LV_ANIM_ON);
   }
 
-  void lv_example_get_started_1(void)
-  {
-    lv_obj_t *btn = lv_btn_create(lv_scr_act());                /*Add a button the current screen*/
-    lv_obj_set_pos(btn, 10, 10);                                /*Set its position*/
-    lv_obj_set_size(btn, 120, 50);                              /*Set its size*/
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL); /*Assign a callback to the button*/
-
-    lv_obj_t *label = lv_label_create(btn); /*Add a label to the button*/
-    lv_label_set_text(label, "Button");     /*Set the labels text*/
-    lv_obj_center(label);
-  }
-
   lv_point_t my_points;
   bool touch_active = false;
 
@@ -269,7 +254,6 @@ extern "C"
   void touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   {
     touch.loop();
-
     if (touch_active)
     {
       data->state = LV_INDEV_STATE_PR;
@@ -286,7 +270,8 @@ extern "C"
 
   void app_main(void)
   {
-    // esp_log_level_set(LOG_touch, ESP_LOG_DEBUG);
+    esp_log_level_set(LOG_touch, ESP_LOG_DEBUG);
+
     touch.i2cSetup(GOODIX_SDA, GOODIX_SCL, GOODIX_SPEED);
     touch.setHandler(handleTouch);
     touch.begin(INT_PIN, RST_PIN);
@@ -300,15 +285,13 @@ extern "C"
     indev_drv.read_cb = touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    example_lvgl_demo_tabs_ui(disp);
-    // lv_example_get_started_1();
-
     style_init();
 
     xMutex_UI = xSemaphoreCreateMutex();
-    xTaskCreate(TaskLvglHandler, "TaskLvglHandler", 4096, NULL, 1, NULL);
-    // xTaskCreate(TaskTouchHandler, "TaskTouchHandler", 8192, NULL, 5, NULL);
-    xTaskCreate(TaskLvglTest, "TaskLvglTest", 4096, NULL, 1, NULL);
+    xTaskCreate(TaskLvglHandler, "TaskLvglHandler", 8192, NULL, 1, NULL);
+
+    example_lvgl_demo_tabs_ui(disp);
+    lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
   }
 
   void TaskLvglHandler(void *Parameters)
@@ -320,80 +303,6 @@ extern "C"
       xSemaphoreGive(xMutex_UI);
 
       vTaskDelay(pdMS_TO_TICKS(10));
-    }
-  }
-
-  void TaskTouchHandler(void *pvParameter)
-  {
-    ESP_LOGI(LOG_touch, ": touch started");
-    while (1)
-    {
-      vTaskDelay(10 / portTICK_PERIOD_MS);
-      // touch.loop();
-    }
-  }
-
-  void TaskLvglTest(void *Parameters)
-  {
-    while (1)
-    {
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 0, LV_ANIM_ON);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 1, LV_ANIM_ON);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 3, LV_ANIM_ON);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 0, LV_ANIM_OFF);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 1, LV_ANIM_OFF);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 2, LV_ANIM_OFF);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_tabview_set_act(tabview, 3, LV_ANIM_OFF);
-      // xSemaphoreGive(xMutex_UI);
-
-      // vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // win();
-      // xSemaphoreGive(xMutex_UI);
-
-      vTaskDelay(pdMS_TO_TICKS(3000));
-
-      // xSemaphoreTake(xMutex_UI, portMAX_DELAY);
-      // lv_obj_del(msgWrapper);
-      // xSemaphoreGive(xMutex_UI);
     }
   }
 }

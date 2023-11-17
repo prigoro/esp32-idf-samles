@@ -24740,7 +24740,7 @@
                         "id": "LV_CONF_SKIP",
                         "name": "LV_CONF_SKIP",
                         "range": null,
-                        "title": null,
+                        "title": "Uncheck this to use custom lv_conf.h",
                         "type": "bool"
                     },
                     {
@@ -24827,8 +24827,8 @@
                             },
                             {
                                 "children": [],
-                                "depends_on": "LV_COLOR_DEPTH_32",
-                                "help": "Can be used if the UI is above another layer, e.g. an OSD menu or video player.\nRequires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to\nnon LV_OPA_COVER value",
+                                "depends_on": null,
+                                "help": "Can be used if the UI is above another layer, e.g. an OSD menu or video player.\nThe screen's `bg_opa` should be set to non LV_OPA_COVER value",
                                 "id": "LV_COLOR_SCREEN_TRANSP",
                                 "name": "LV_COLOR_SCREEN_TRANSP",
                                 "range": null,
@@ -24885,7 +24885,10 @@
                                 "help": null,
                                 "id": "LV_MEM_SIZE_KILOBYTES",
                                 "name": "LV_MEM_SIZE_KILOBYTES",
-                                "range": null,
+                                "range": [
+                                    2,
+                                    128
+                                ],
                                 "title": "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)",
                                 "type": "int"
                             },
@@ -25032,6 +25035,16 @@
                                     {
                                         "children": [],
                                         "depends_on": null,
+                                        "help": "\"Simple layers\" are used when a widget has `style_opa < 255`\nto buffer the widget into a layer and blend it as an image\nwith the given opacity. Note that `bg_opa`, `text_opa` etc\ndon't require buffering into layer.",
+                                        "id": "LV_LAYER_SIMPLE_BUF_SIZE",
+                                        "name": "LV_LAYER_SIMPLE_BUF_SIZE",
+                                        "range": null,
+                                        "title": "Optimal size to buffer the widget with opacity",
+                                        "type": "int"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": null,
                                         "help": "If only the built-in image formats are used there is no real advantage of caching.\n(I.e. no new image decoder is added).\n\nWith complex image decoders (e.g. PNG or JPG) caching can\nsave the continuous open/decode of images.\nHowever the opened images might consume additional RAM.",
                                         "id": "LV_IMG_CACHE_DEF_SIZE",
                                         "name": "LV_IMG_CACHE_DEF_SIZE",
@@ -25101,11 +25114,11 @@
                                     {
                                         "children": [],
                                         "depends_on": null,
-                                        "help": null,
-                                        "id": "LV_USE_EXTERNAL_RENDERER",
-                                        "name": "LV_USE_EXTERNAL_RENDERER",
+                                        "help": "Must deploy arm-2d library to your project and add include PATH for \"arm_2d.h\".",
+                                        "id": "LV_USE_GPU_ARM2D",
+                                        "name": "LV_USE_GPU_ARM2D",
                                         "range": null,
-                                        "title": null,
+                                        "title": "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors.",
                                         "type": "bool"
                                     },
                                     {
@@ -25127,6 +25140,48 @@
                                         "name": "LV_USE_GPU_STM32_DMA2D",
                                         "range": null,
                                         "title": "Enable STM32 DMA2D (aka Chrom Art) GPU.",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [],
+                                                "depends_on": "LV_USE_GPU_RA6M3_G2D",
+                                                "help": "Must be defined to include path of target processor\ne.g. \"hal_data.h\"",
+                                                "id": "LV_GPU_RA6M3_G2D_INCLUDE",
+                                                "name": "LV_GPU_RA6M3_G2D_INCLUDE",
+                                                "range": null,
+                                                "title": "include path of target processor",
+                                                "type": "string"
+                                            }
+                                        ],
+                                        "depends_on": null,
+                                        "help": null,
+                                        "id": "LV_USE_GPU_RA6M3_G2D",
+                                        "name": "LV_USE_GPU_RA6M3_G2D",
+                                        "range": null,
+                                        "title": "Enable RA6M3 G2D GPU.",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [],
+                                                "depends_on": "LV_USE_GPU_SWM341_DMA2D",
+                                                "help": "Must be defined to include path of CMSIS header of target processor\ne.g. \"SWM341.h\"",
+                                                "id": "LV_GPU_SWM341_DMA2D_INCLUDE",
+                                                "name": "LV_GPU_SWM341_DMA2D_INCLUDE",
+                                                "range": null,
+                                                "title": "include path of CMSIS header of target processor",
+                                                "type": "string"
+                                            }
+                                        ],
+                                        "depends_on": null,
+                                        "help": null,
+                                        "id": "LV_USE_GPU_SWM341_DMA2D",
+                                        "name": "LV_USE_GPU_SWM341_DMA2D",
+                                        "range": null,
+                                        "title": "Enable SWM341 DMA2D GPU.",
                                         "type": "bool"
                                     },
                                     {
@@ -25171,6 +25226,16 @@
                                                 "range": null,
                                                 "title": "include path of SDL header",
                                                 "type": "string"
+                                            },
+                                            {
+                                                "children": [],
+                                                "depends_on": "LV_USE_GPU_SDL",
+                                                "help": "Texture cache size, 8MB by default.",
+                                                "id": "LV_GPU_SDL_LRU_SIZE",
+                                                "name": "LV_GPU_SDL_LRU_SIZE",
+                                                "range": null,
+                                                "title": "Maximum buffer size to allocate for rotation",
+                                                "type": "int"
                                             }
                                         ],
                                         "depends_on": null,
@@ -25534,8 +25599,8 @@
                                                         "children": [],
                                                         "depends_on": "<choice>",
                                                         "help": null,
-                                                        "id": "LV_PERF_MONITOR_ALIGN_BOTTOM_CENTER",
-                                                        "name": "LV_PERF_MONITOR_ALIGN_BOTTOM_CENTER",
+                                                        "id": "LV_PERF_MONITOR_ALIGN_CENTER",
+                                                        "name": "LV_PERF_MONITOR_ALIGN_CENTER",
                                                         "range": null,
                                                         "title": "Center",
                                                         "type": "bool"
@@ -25645,8 +25710,8 @@
                                                         "children": [],
                                                         "depends_on": "<choice>",
                                                         "help": null,
-                                                        "id": "LV_MEM_MONITOR_ALIGN_BOTTOM_CENTER",
-                                                        "name": "LV_MEM_MONITOR_ALIGN_BOTTOM_CENTER",
+                                                        "id": "LV_MEM_MONITOR_ALIGN_CENTER",
+                                                        "name": "LV_MEM_MONITOR_ALIGN_CENTER",
                                                         "range": null,
                                                         "title": "Center",
                                                         "type": "bool"
@@ -26411,6 +26476,16 @@
                                 "range": null,
                                 "title": "Enable subpixel rendering.",
                                 "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_FONT_PLACEHOLDER",
+                                "name": "LV_USE_FONT_PLACEHOLDER",
+                                "range": null,
+                                "title": "Enable drawing placeholders when glyph dsc is not found.",
+                                "type": "bool"
                             }
                         ],
                         "depends_on": null,
@@ -26912,6 +26987,27 @@
                                 "type": "bool"
                             },
                             {
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_SPAN",
+                                        "help": null,
+                                        "id": "LV_SPAN_SNIPPET_STACK_SIZE",
+                                        "name": "LV_SPAN_SNIPPET_STACK_SIZE",
+                                        "range": null,
+                                        "title": "Maximum number of span descriptor",
+                                        "type": "int"
+                                    }
+                                ],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_SPAN",
+                                "name": "LV_USE_SPAN",
+                                "range": null,
+                                "title": "span",
+                                "type": "bool"
+                            },
+                            {
                                 "children": [],
                                 "depends_on": null,
                                 "help": null,
@@ -26959,27 +27055,6 @@
                                 "name": "LV_USE_WIN",
                                 "range": null,
                                 "title": "Win",
-                                "type": "bool"
-                            },
-                            {
-                                "children": [
-                                    {
-                                        "children": [],
-                                        "depends_on": "LV_USE_SPAN",
-                                        "help": null,
-                                        "id": "LV_SPAN_SNIPPET_STACK_SIZE",
-                                        "name": "LV_SPAN_SNIPPET_STACK_SIZE",
-                                        "range": null,
-                                        "title": "Maximum number of span descriptor",
-                                        "type": "int"
-                                    }
-                                ],
-                                "depends_on": null,
-                                "help": null,
-                                "id": "LV_USE_SPAN",
-                                "name": "LV_USE_SPAN",
-                                "range": null,
-                                "title": "span",
                                 "type": "bool"
                             }
                         ],
@@ -27040,6 +27115,16 @@
                                 "range": null,
                                 "title": "A very simple theme that is a good starting point for a custom theme",
                                 "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_THEME_MONO",
+                                "name": "LV_USE_THEME_MONO",
+                                "range": null,
+                                "title": "Monochrome theme, suitable for some E-paper & dot matrix displays",
+                                "type": "bool"
                             }
                         ],
                         "depends_on": null,
@@ -27078,7 +27163,38 @@
                     {
                         "children": [
                             {
-                                "children": [],
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_STDIO",
+                                        "help": null,
+                                        "id": "LV_FS_STDIO_LETTER",
+                                        "name": "LV_FS_STDIO_LETTER",
+                                        "range": null,
+                                        "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )",
+                                        "type": "int"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_STDIO",
+                                        "help": null,
+                                        "id": "LV_FS_STDIO_PATH",
+                                        "name": "LV_FS_STDIO_PATH",
+                                        "range": null,
+                                        "title": "Set the working directory",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_STDIO",
+                                        "help": null,
+                                        "id": "LV_FS_STDIO_CACHE_SIZE",
+                                        "name": "LV_FS_STDIO_CACHE_SIZE",
+                                        "range": null,
+                                        "title": ">0 to cache this number of bytes in lv_fs_read()",
+                                        "type": "int"
+                                    }
+                                ],
                                 "depends_on": null,
                                 "help": null,
                                 "id": "LV_USE_FS_STDIO",
@@ -27088,37 +27204,38 @@
                                 "type": "bool"
                             },
                             {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_STDIO != 0",
-                                "help": null,
-                                "id": "LV_FS_STDIO_LETTER",
-                                "name": "LV_FS_STDIO_LETTER",
-                                "range": null,
-                                "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )",
-                                "type": "string"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_STDIO != 0",
-                                "help": null,
-                                "id": "LV_FS_STDIO_PATH",
-                                "name": "LV_FS_STDIO_PATH",
-                                "range": null,
-                                "title": "Set the working directory",
-                                "type": "string"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_STDIO != 0",
-                                "help": null,
-                                "id": "LV_FS_STDIO_CACHE_SIZE",
-                                "name": "LV_FS_STDIO_CACHE_SIZE",
-                                "range": null,
-                                "title": ">0 to cache this number of bytes in lv_fs_read()",
-                                "type": "string"
-                            },
-                            {
-                                "children": [],
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_POSIX",
+                                        "help": null,
+                                        "id": "LV_FS_POSIX_LETTER",
+                                        "name": "LV_FS_POSIX_LETTER",
+                                        "range": null,
+                                        "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
+                                        "type": "int"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_POSIX",
+                                        "help": null,
+                                        "id": "LV_FS_POSIX_PATH",
+                                        "name": "LV_FS_POSIX_PATH",
+                                        "range": null,
+                                        "title": "Set the working directory",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_POSIX",
+                                        "help": null,
+                                        "id": "LV_FS_POSIX_CACHE_SIZE",
+                                        "name": "LV_FS_POSIX_CACHE_SIZE",
+                                        "range": null,
+                                        "title": ">0 to cache this number of bytes in lv_fs_read()",
+                                        "type": "int"
+                                    }
+                                ],
                                 "depends_on": null,
                                 "help": null,
                                 "id": "LV_USE_FS_POSIX",
@@ -27128,37 +27245,38 @@
                                 "type": "bool"
                             },
                             {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_POSIX != 0",
-                                "help": null,
-                                "id": "LV_FS_POSIX_LETTER",
-                                "name": "LV_FS_POSIX_LETTER",
-                                "range": null,
-                                "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
-                                "type": "int"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_POSIX != 0",
-                                "help": null,
-                                "id": "LV_FS_POSIX_PATH",
-                                "name": "LV_FS_POSIX_PATH",
-                                "range": null,
-                                "title": "Set the working directory",
-                                "type": "string"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_POSIX != 0",
-                                "help": null,
-                                "id": "LV_FS_POSIX_CACHE_SIZE",
-                                "name": "LV_FS_POSIX_CACHE_SIZE",
-                                "range": null,
-                                "title": ">0 to cache this number of bytes in lv_fs_read()",
-                                "type": "int"
-                            },
-                            {
-                                "children": [],
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_WIN32",
+                                        "help": null,
+                                        "id": "LV_FS_WIN32_LETTER",
+                                        "name": "LV_FS_WIN32_LETTER",
+                                        "range": null,
+                                        "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
+                                        "type": "int"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_WIN32",
+                                        "help": null,
+                                        "id": "LV_FS_WIN32_PATH",
+                                        "name": "LV_FS_WIN32_PATH",
+                                        "range": null,
+                                        "title": "Set the working directory",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_WIN32",
+                                        "help": null,
+                                        "id": "LV_FS_WIN32_CACHE_SIZE",
+                                        "name": "LV_FS_WIN32_CACHE_SIZE",
+                                        "range": null,
+                                        "title": ">0 to cache this number of bytes in lv_fs_read()",
+                                        "type": "int"
+                                    }
+                                ],
                                 "depends_on": null,
                                 "help": null,
                                 "id": "LV_USE_FS_WIN32",
@@ -27168,37 +27286,28 @@
                                 "type": "bool"
                             },
                             {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_WIN32 != 0",
-                                "help": null,
-                                "id": "LV_FS_WIN32_LETTER",
-                                "name": "LV_FS_WIN32_LETTER",
-                                "range": null,
-                                "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
-                                "type": "int"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_WIN32 != 0",
-                                "help": null,
-                                "id": "LV_FS_WIN32_PATH",
-                                "name": "LV_FS_WIN32_PATH",
-                                "range": null,
-                                "title": "Set the working directory",
-                                "type": "string"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_WIN32 != 0",
-                                "help": null,
-                                "id": "LV_FS_WIN32_CACHE_SIZE",
-                                "name": "LV_FS_WIN32_CACHE_SIZE",
-                                "range": null,
-                                "title": ">0 to cache this number of bytes in lv_fs_read()",
-                                "type": "int"
-                            },
-                            {
-                                "children": [],
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_FATFS",
+                                        "help": null,
+                                        "id": "LV_FS_FATFS_LETTER",
+                                        "name": "LV_FS_FATFS_LETTER",
+                                        "range": null,
+                                        "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
+                                        "type": "int"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_FS_FATFS",
+                                        "help": null,
+                                        "id": "LV_FS_FATFS_CACHE_SIZE",
+                                        "name": "LV_FS_FATFS_CACHE_SIZE",
+                                        "range": null,
+                                        "title": ">0 to cache this number of bytes in lv_fs_read()",
+                                        "type": "int"
+                                    }
+                                ],
                                 "depends_on": null,
                                 "help": null,
                                 "id": "LV_USE_FS_FATFS",
@@ -27206,26 +27315,6 @@
                                 "range": null,
                                 "title": "File system on top of FatFS",
                                 "type": "bool"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_FATFS != 0",
-                                "help": null,
-                                "id": "LV_FS_FATFS_LETTER",
-                                "name": "LV_FS_FATFS_LETTER",
-                                "range": null,
-                                "title": "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)",
-                                "type": "int"
-                            },
-                            {
-                                "children": [],
-                                "depends_on": "LV_USE_FS_FATFS != 0",
-                                "help": null,
-                                "id": "LV_FS_FATFS_CACHE_SIZE",
-                                "name": "LV_FS_FATFS_CACHE_SIZE",
-                                "range": null,
-                                "title": ">0 to cache this number of bytes in lv_fs_read()",
-                                "type": "int"
                             },
                             {
                                 "children": [],
@@ -27352,10 +27441,10 @@
                                         "children": [],
                                         "depends_on": "LV_USE_FFMPEG",
                                         "help": null,
-                                        "id": "LV_FFMPEG_AV_DUMP_FORMAT",
-                                        "name": "LV_FFMPEG_AV_DUMP_FORMAT",
+                                        "id": "LV_FFMPEG_DUMP_FORMAT",
+                                        "name": "LV_FFMPEG_DUMP_FORMAT",
                                         "range": null,
-                                        "title": "Dump av format",
+                                        "title": "Dump format",
                                         "type": "bool"
                                     }
                                 ],
@@ -27393,6 +27482,98 @@
                                 "name": "LV_USE_MONKEY",
                                 "range": null,
                                 "title": "Enable Monkey test",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_GRIDNAV",
+                                "name": "LV_USE_GRIDNAV",
+                                "range": null,
+                                "title": "Enable grid navigation",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_FRAGMENT",
+                                "name": "LV_USE_FRAGMENT",
+                                "range": null,
+                                "title": "Enable lv_obj fragment",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_IMGFONT",
+                                "name": "LV_USE_IMGFONT",
+                                "range": null,
+                                "title": "draw img in label or span obj",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_MSG",
+                                "name": "LV_USE_MSG",
+                                "range": null,
+                                "title": "Enable a published subscriber based messaging system",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [],
+                                                "depends_on": "LV_IME_PINYIN_USE_K9_MODE",
+                                                "help": null,
+                                                "id": "LV_IME_PINYIN_K9_CAND_TEXT_NUM",
+                                                "name": "LV_IME_PINYIN_K9_CAND_TEXT_NUM",
+                                                "range": null,
+                                                "title": "Maximum number of candidate panels for 9-key input mode",
+                                                "type": "int"
+                                            }
+                                        ],
+                                        "depends_on": "LV_USE_IME_PINYIN",
+                                        "help": null,
+                                        "id": "LV_IME_PINYIN_USE_K9_MODE",
+                                        "name": "LV_IME_PINYIN_USE_K9_MODE",
+                                        "range": null,
+                                        "title": "Enable Pinyin input method 9 key input mode",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_IME_PINYIN",
+                                        "help": "If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesauruss",
+                                        "id": "LV_IME_PINYIN_USE_DEFAULT_DICT",
+                                        "name": "LV_IME_PINYIN_USE_DEFAULT_DICT",
+                                        "range": null,
+                                        "title": "Use built-in Thesaurus",
+                                        "type": "bool"
+                                    },
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_IME_PINYIN",
+                                        "help": "Set the maximum number of candidate panels that can be displayed.\nThis needs to be adjusted according to the size of the screen.",
+                                        "id": "LV_IME_PINYIN_CAND_TEXT_NUM",
+                                        "name": "LV_IME_PINYIN_CAND_TEXT_NUM",
+                                        "range": null,
+                                        "title": "Maximum number of candidate panels",
+                                        "type": "int"
+                                    }
+                                ],
+                                "depends_on": null,
+                                "help": null,
+                                "id": "LV_USE_IME_PINYIN",
+                                "name": "LV_USE_IME_PINYIN",
+                                "range": null,
+                                "title": "Enable Pinyin input method",
                                 "type": "bool"
                             }
                         ],
@@ -27453,7 +27634,18 @@
                                 "type": "bool"
                             },
                             {
-                                "children": [],
+                                "children": [
+                                    {
+                                        "children": [],
+                                        "depends_on": "LV_USE_DEMO_BENCHMARK",
+                                        "help": null,
+                                        "id": "LV_DEMO_BENCHMARK_RGB565A8",
+                                        "name": "LV_DEMO_BENCHMARK_RGB565A8",
+                                        "range": null,
+                                        "title": "Use RGB565A8 images with 16 bit color depth instead of ARGB8565",
+                                        "type": "bool"
+                                    }
+                                ],
                                 "depends_on": null,
                                 "help": null,
                                 "id": "LV_USE_DEMO_BENCHMARK",
