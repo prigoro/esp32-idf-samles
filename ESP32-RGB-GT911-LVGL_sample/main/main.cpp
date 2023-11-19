@@ -33,6 +33,25 @@ extern "C"
   lv_style_t style_msg_win;
   lv_style_t style_all_btns;
   lv_obj_t *msgWrapper;
+  
+  // -------------------------- Helpers --------------------------
+  void touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
+  {
+    GTOutput *tp_pnts = touch.loop();
+    if (tp_pnts->tp_active)
+    {
+      data->state = LV_INDEV_STATE_PR;
+      data->point.x = tp_pnts->points[0].x;
+      data->point.y = tp_pnts->points[0].y;
+      // ESP_LOGI(LOG_touch, "C%d: %d,%d", 0, data->point.x, data->point.y);
+    }
+    else
+    {
+      data->state = LV_INDEV_STATE_REL;
+    }
+  }
+
+  // -------------------------- Helpers --------------------------
 
   void style_init()
   {
@@ -95,7 +114,7 @@ extern "C"
     lv_obj_t *btn = lv_btn_create(cont);
     lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -40);
     lv_obj_add_style(btn, &style_all_btns, 0);
-    lv_obj_add_event_cb(btn, cb_Close, LV_EVENT_CLICKED, msgWrapper);
+    lv_obj_add_event_cb(btn, cb_Close, LV_EVENT_CLICKED, 0);
 
     label = lv_label_create(btn);
     lv_obj_center(label);
@@ -235,45 +254,12 @@ extern "C"
     lv_obj_scroll_to_view_recursive(label, LV_ANIM_ON);
   }
 
-  lv_point_t my_points;
-  bool touch_active = false;
-
-  // Touch
-  void handleTouch(int8_t contacts, GTPoint *points)
-  {
-    // ESP_LOGD(LOG_touch, "Contacts: %d", contacts);
-    my_points.x = points[0].x;
-    my_points.y = points[0].y;
-    touch_active = true;
-    // for (uint8_t i = 0; i < contacts; i++)
-    // {
-    //   ESP_LOGI(LOG_touch, "C%d: #%d %d,%d s:%d", i, points[i].trackId, points[i].x, points[i].y, points[i].area);
-    // }
-  }
-
-  void touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
-  {
-    touch.loop();
-    if (touch_active)
-    {
-      data->state = LV_INDEV_STATE_PR;
-      data->point.x = my_points.x;
-      data->point.y = my_points.y;
-      touch_active = false;
-      // ESP_LOGI(LOG_touch, "C%d: %d,%d", 0, data->point.x, data->point.y);
-    }
-    else
-    {
-      data->state = LV_INDEV_STATE_REL;
-    }
-  }
-
   void app_main(void)
   {
     esp_log_level_set(LOG_touch, ESP_LOG_DEBUG);
 
     touch.i2cSetup(GOODIX_SDA, GOODIX_SCL, GOODIX_SPEED);
-    touch.setHandler(handleTouch);
+    // touch.setHandler(handleTouch);
     touch.begin(INT_PIN, RST_PIN);
 
     lv_disp_t *disp = lcd_begin();
@@ -302,7 +288,7 @@ extern "C"
       lv_timer_handler();
       xSemaphoreGive(xMutex_UI);
 
-      vTaskDelay(pdMS_TO_TICKS(10));
+      vTaskDelay(pdMS_TO_TICKS(5));
     }
   }
 }

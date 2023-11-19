@@ -15,8 +15,8 @@
 #define LOG_touch "GOODIX"
 #define GOODIX_OK 0
 
-#define GT911_ADDR1 (uint8_t)0x5D
-#define GT911_ADDR2 (uint8_t)0x14
+// #define GT911_ADDR1 (uint8_t)0x5D
+// #define GT911_ADDR2 (uint8_t)0x14
 
 // 0x28/0x29 (0x14 7bit)
 #define GOODIX_I2C_ADDR_28 0x14
@@ -33,7 +33,7 @@
 #define GOODIX_CONFIG_911_LENGTH 186
 #define GOODIX_CONFIG_967_LENGTH 228
 
-// #define TP_USE_IRQ
+// #define GOODIX_USE_IRQ
 
 /* Register defines */
 #define GT_REG_CMD 0x8040
@@ -162,6 +162,8 @@ public:
   uint8_t i2cAddr;
   struct GTConfig config;
   struct GTInfo info;
+  struct GTOutput gt_output;
+
   uint8_t points[GOODIX_MAX_CONTACTS * GOODIX_CONTACT_SIZE]; // points buffer
 
   Goodix();
@@ -171,7 +173,7 @@ public:
   bool begin(uint8_t interruptPin, uint8_t resetPin, uint8_t addr = GOODIX_I2C_ADDR_BA);
   bool reset();
   uint8_t test();
-  void loop();
+  GTOutput *loop();
   void i2cSetup(uint8_t sda, uint8_t scl, uint32_t speed);
 
   uint8_t write(uint16_t reg, uint8_t *buf, size_t len);
@@ -207,6 +209,8 @@ private:
   void pinIn(uint8_t pin);
   void pinOut(uint8_t pin);
   void pinSet(uint8_t pin, uint8_t level);
+
+  
 
   // Used with pulled-up lines, set pin mode to out, write LOW
   void pinHold(uint8_t pin);

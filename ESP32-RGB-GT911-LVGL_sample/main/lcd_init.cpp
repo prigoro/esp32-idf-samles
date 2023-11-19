@@ -1,8 +1,10 @@
 
 #include "lcd_init.h"
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
 #define LVGL_TICK_PERIOD_MS 2
 
     static const char *TAG_lcd = "LCD_init";
@@ -22,7 +24,6 @@ extern "C"
     static void example_increase_lvgl_tick(void *arg)
     {
         /* Tell LVGL how many milliseconds has elapsed */
-        // lv_tick_inc(EXAMPLE_LVGL_TICK_PERIOD_MS);
         lv_tick_inc(LVGL_TICK_PERIOD_MS);
     }
 
@@ -35,7 +36,6 @@ extern "C"
 #if LCD_PIN_NUM_BK_LIGHT >= 0
         ESP_LOGI(TAG_lcd, "Turn off LCD backlight");
         ESP_ERROR_CHECK(gpio_set_direction((gpio_num_t)LCD_PIN_NUM_BK_LIGHT, GPIO_MODE_OUTPUT));
-
 #endif
         ESP_LOGI(TAG_lcd, "Install RGB LCD panel driver");
         esp_lcd_rgb_panel_config_t panel_config = {
@@ -51,15 +51,20 @@ extern "C"
                 .vsync_back_porch = 8,  // 8
                 .vsync_front_porch = 8, // 8
                 .flags = {
-                    .hsync_idle_low = true, //??????
+                    .hsync_idle_low = false, //??????
+                    .vsync_idle_low = false, //??????
+                    .de_idle_high = false,   //??????
                     .pclk_active_neg = true,
+                    .pclk_idle_high = false, //??????
                 },
             },
-            .data_width = 16, // RGB565 in parallel mode, thus 16bit in width
+            .data_width = 16,    // RGB565 in parallel mode, thus 16bit in width
+            .bits_per_pixel = 0, //??????
             .num_fbs = EXAMPLE_LCD_NUM_FB,
-#if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
-            .bounce_buffer_size_px = 10 * LCD_H_RES,
-#endif
+            // #if CONFIG_EXAMPLE_USE_BOUNCE_BUFFER
+            // .bounce_buffer_size_px = 10 * LCD_H_RES, // ????????
+            // #endif
+            // .sram_trans_align = 0,                   //???????
             .psram_trans_align = 64,
             .hsync_gpio_num = LCD_PIN_NUM_HSYNC,
             .vsync_gpio_num = LCD_PIN_NUM_VSYNC,
@@ -85,7 +90,12 @@ extern "C"
                 LCD_PIN_NUM_DATA15,
             },
             .flags = {
-                .fb_in_psram = true, // allocate frame buffer in PSRAM
+                .disp_active_low = false,       // ?????
+                .refresh_on_demand = false,     // ?????
+                .fb_in_psram = true,            // allocate frame buffer in PSRAM
+                .double_fb = false,             // ?????
+                .no_fb = false,                 // ?????
+                .bb_invalidate_cache = false,   // ?????
             },
         };
         ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &panel_handle));
@@ -106,14 +116,14 @@ extern "C"
         // initialize LVGL draw buffers
         lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LCD_H_RES * LCD_V_RES);
 #else
-        ESP_LOGI(TAG_lcd, "Allocate separate LVGL draw buffers from PSRAM");
-        buf1 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-        // assert(buf1);
-        buf2 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-        // assert(buf2);
+    ESP_LOGI(TAG_lcd, "Allocate separate LVGL draw buffers from PSRAM");
+    buf1 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    // assert(buf1);
+    buf2 = heap_caps_malloc(LCD_H_RES * 100 * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+    // assert(buf2);
 
-        // initialize LVGL draw buffers
-        lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LCD_H_RES * 100);
+    // initialize LVGL draw buffers
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, LCD_H_RES * 100);
 
 #endif // CONFIG_EXAMPLE_DOUBLE_FB
 
@@ -134,14 +144,19 @@ extern "C"
         // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
         const esp_timer_create_args_t lvgl_tick_timer_args = {
             .callback = &example_increase_lvgl_tick,
-            .name = "lvgl_tick"};
+            .arg = NULL, // ???????
+            .dispatch_method = (esp_timer_dispatch_t)0, // ???????
+            .name = "lvgl_tick",
+            .skip_unhandled_events = false, // ???????
+            };
         esp_timer_handle_t lvgl_tick_timer = NULL;
         ESP_ERROR_CHECK(esp_timer_create(&lvgl_tick_timer_args, &lvgl_tick_timer));
         ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, LVGL_TICK_PERIOD_MS * 1000));
-        // ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
 
         ESP_LOGI(TAG_lcd, "Display LVGL Scatter Chart");
 
         return disp;
     }
+#ifdef __cplusplus
 }
+#endif

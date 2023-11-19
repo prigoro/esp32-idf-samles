@@ -305,17 +305,30 @@ extern "C"
         */
     }
 
-    void Goodix::loop()
+    GTOutput *Goodix::loop()
     {
-#ifdef TP_USE_IRQ
+#ifdef GOODIX_USE_IRQ
         uint8_t irq = goodixIRQ;
         goodixIRQ = 0;
         if (irq)
         {
             onIRQ();
         }
+        return NULL;
 #else
-        onIRQ();
+        int8_t contacts;
+        contacts = readInput(points);
+        if (contacts < 0)
+        {
+            gt_output.tp_active = false;
+        }
+        else if (contacts > 0)
+        {
+            gt_output.tp_active = true;
+            gt_output.points = (GTPoint *)points;
+        }
+        write(GOODIX_READ_COORD_ADDR, 0);
+        return &gt_output;
 #endif
     }
 
@@ -456,8 +469,17 @@ extern "C"
     {
         vTaskDelay(microseconds);
     }
+}
 
-    //
+// --------------------- helpers ---------------------
+void handleTouch(int8_t contacts, GTPoint *points)
+{
+    // Before use call - touch_obj.setHandler(handleTouch);
+    // ESP_LOGD(LOG_touch, "handleTouch: %d", contacts);
+    for (uint8_t i = 0; i < contacts; i++)
+    {
+        // ESP_LOGI(LOG_touch, "C%d: #%d %d,%d s:%d", i, points[i].trackId, points[i].x, points[i].y, points[i].area);
+    }
 }
 
 void i2c_scan()
@@ -513,23 +535,23 @@ uint8_t dumpCFG(Goodix &tp_obj)
 }
 
 uint8_t dumpRegID(Goodix &tp_obj)
-  {
+{
     uint8_t buffer[11];
     uint8_t i2c_err = tp_obj.read(GOODIX_REG_ID, buffer, 11);
     if (i2c_err != ESP_OK)
     {
-      ESP_LOGD(LOG_touch, "---error---");
+        ESP_LOGD(LOG_touch, "---error---");
     }
     else
     {
-      ESP_LOGD(LOG_touch, "-no--error--");
-      printf("Product-ID: %c%c%c%c\r\n", buffer[0], buffer[1], buffer[2], buffer[3]);
-      printf("Firmware-Version: %x%x\r\n", buffer[5], buffer[4]);
-      uint16_t res = buffer[6] | buffer[7] << 8;
-      printf("X-Resolution: %d\r\n", res);
-      res = buffer[8] | buffer[9] << 8;
-      printf("Y-Resolution: %d\r\n", res);
-      printf("Vendor-ID: %x\r\n", buffer[10]);
+        ESP_LOGD(LOG_touch, "-no--error--");
+        printf("Product-ID: %c%c%c%c\r\n", buffer[0], buffer[1], buffer[2], buffer[3]);
+        printf("Firmware-Version: %x%x\r\n", buffer[5], buffer[4]);
+        uint16_t res = buffer[6] | buffer[7] << 8;
+        printf("X-Resolution: %d\r\n", res);
+        res = buffer[8] | buffer[9] << 8;
+        printf("Y-Resolution: %d\r\n", res);
+        printf("Vendor-ID: %x\r\n", buffer[10]);
     }
     return i2c_err;
-  }
+}
