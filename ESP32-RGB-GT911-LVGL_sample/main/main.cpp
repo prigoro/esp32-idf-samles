@@ -24,8 +24,10 @@ extern "C"
 {
   Goodix touch = Goodix();
   SemaphoreHandle_t xMutex_UI;
+  SemaphoreHandle_t xMutex_StartUp;
 
   void TaskLvglHandler(void *Parameters);
+  void TaskLvglStartUp(void *Parameters);
 
   static lv_obj_t *kb;
   lv_obj_t *tabview;
@@ -33,7 +35,7 @@ extern "C"
   lv_style_t style_msg_win;
   lv_style_t style_all_btns;
   lv_obj_t *msgWrapper;
-  
+
   // -------------------------- Helpers --------------------------
   void touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   {
@@ -141,7 +143,7 @@ extern "C"
     }
   }
 
-  void example_lvgl_demo_tabs_ui(lv_disp_t *disp)
+  void example_lvgl_demo_tabs_ui()
   {
     tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 50);
 
@@ -271,13 +273,13 @@ extern "C"
     indev_drv.read_cb = touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    style_init();
-
     xMutex_UI = xSemaphoreCreateMutex();
+    xMutex_StartUp = xSemaphoreCreateMutex();
     xTaskCreate(TaskLvglHandler, "TaskLvglHandler", 8192, NULL, 1, NULL);
+    xTaskCreate(TaskLvglStartUp, "TaskLvglStartUp", 8192, NULL, 1, NULL);
 
-    example_lvgl_demo_tabs_ui(disp);
-    lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
+    // lv_tabview_set_act(tabview, 2, LV_ANIM_ON);
+    xSemaphoreGive(xMutex_StartUp);
   }
 
   void TaskLvglHandler(void *Parameters)
@@ -288,7 +290,21 @@ extern "C"
       lv_timer_handler();
       xSemaphoreGive(xMutex_UI);
 
-      vTaskDelay(pdMS_TO_TICKS(5));
+      vTaskDelay(pdMS_TO_TICKS(10));
+    }
+  }
+
+  void TaskLvglStartUp(void *Parameters)
+  {
+    while (1)
+    {
+      xSemaphoreTake(xMutex_StartUp, portMAX_DELAY);
+      xSemaphoreTake(xMutex_UI, portMAX_DELAY);
+      style_init();
+      example_lvgl_demo_tabs_ui();
+      xSemaphoreGive(xMutex_UI);
+
+      vTaskDelay(pdMS_TO_TICKS(10));
     }
   }
 }
